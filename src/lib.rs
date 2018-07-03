@@ -4,7 +4,7 @@ use std::io::prelude::*;
 
 pub struct Config {
     filepath: String,
-    search: String,
+    query: String,
 }
 
 impl Config {
@@ -13,15 +13,15 @@ impl Config {
             return Err("not enough arguments");
         }
 
-        let filepath = args[1].clone();
-        let search = args[2].clone();
+        let query = args[1].clone();
+        let filepath = args[2].clone();
 
-        Ok(Config { filepath, search })
+        Ok(Config { filepath, query })
     }
 }
 
 pub fn run(config: Config) -> Result<(), Box<Error>> {
-    println!("Searching '{}' for '{}'", config.filepath, config.search);
+    println!("Searching '{}' for '{}'", config.filepath, config.query);
 
     let mut file = File::open(&config.filepath)?;
     let mut file_contents = String::new();
@@ -38,13 +38,13 @@ mod test {
 
     #[test]
     fn one_result() {
-        let search = "bbb";
+        let query = "bbb";
         let contents = "\
             aaa
             bbb
             ccc
             ";
-        assert_eq!(vec!["bbb"], occurences(&search, &contents));
+        assert_eq!(vec!["bbb"], search(&query, &contents));
     }
 
 }
