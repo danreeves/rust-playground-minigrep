@@ -28,7 +28,7 @@ impl Config {
 }
 
 pub fn run(config: Config) -> Result<(), Box<Error>> {
-    println!("Searching '{}' for '{}'", config.filepath, config.query);
+    println!("Searching '{}' for '{}'\n", config.filepath, config.query);
 
     let mut file = File::open(&config.filepath)?;
     let mut file_contents = String::new();
