@@ -27,9 +27,23 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
     let mut file_contents = String::new();
     file.read_to_string(&mut file_contents)?;
 
-    println!("{}", file_contents);
+    for line in search(&config.query, &file_contents) {
+        println!("{}", line);
+    }
 
     Ok(())
+}
+
+fn search<'c>(query: &str, contents: &'c str) -> Vec<&'c str> {
+    let mut results = Vec::new();
+
+    for line in contents.lines() {
+        if line.contains(query) {
+            results.push(line);
+        }
+    }
+
+    results
 }
 
 #[cfg(test)]
@@ -39,11 +53,7 @@ mod test {
     #[test]
     fn one_result() {
         let query = "bbb";
-        let contents = "\
-            aaa
-            bbb
-            ccc
-            ";
+        let contents = "aaa\nbbb\nccc";
         assert_eq!(vec!["bbb"], search(&query, &contents));
     }
 
