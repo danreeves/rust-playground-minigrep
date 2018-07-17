@@ -10,13 +10,24 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(args: &[String]) -> Result<Config, &'static str> {
+    pub fn new(mut args: env::Args) -> Result<Config, &'static str> {
         if args.len() < 3 {
             return Err("not enough arguments");
         }
 
-        let query = args[1].clone();
-        let filepath = args[2].clone();
+        // Pop off the binary name
+        args.next();
+
+        let query = match args.next() {
+            Some(arg) => arg,
+            None => return Err("no query string passed"),
+        };
+
+        let filepath = match args.next() {
+            Some(arg) => arg,
+            None => return Err("no filepath passed"),
+        };
+
         let case_insensitive = env::var("MINIGREP_CASE_INSENSITIVE").is_ok();
 
         Ok(Config {
@@ -48,28 +59,18 @@ pub fn run(config: Config) -> Result<(), Box<Error>> {
 }
 
 fn search<'c>(query: &str, contents: &'c str) -> Vec<&'c str> {
-    let mut results = Vec::new();
-
-    for line in contents.lines() {
-        if line.contains(query) {
-            results.push(line);
-        }
-    }
-
-    results
+    contents
+        .lines()
+        .filter(|line| line.contains(query))
+        .collect()
 }
 
 fn case_insensitive_search<'c>(query: &str, contents: &'c str) -> Vec<&'c str> {
     let query = query.to_lowercase();
-    let mut results = Vec::new();
-
-    for line in contents.lines() {
-        if line.to_lowercase().contains(&query) {
-            results.push(line);
-        }
-    }
-
-    results
+    contents
+        .lines()
+        .filter(|line| line.to_lowercase().contains(&query))
+        .collect()
 }
 
 #[cfg(test)]
